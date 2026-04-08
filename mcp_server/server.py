@@ -273,7 +273,7 @@ def query_memory(query: str, n_results: int = 3) -> str:
 @mcp.tool()
 def generate_image(character_name: str, appearance_description: str) -> str:
     """
-    Generate a character reference image using Google Gemini image generation.
+    Generate a character reference image using Pollinations.ai.
 
     Args:
         character_name: Name of the character (used for filename).
@@ -282,70 +282,50 @@ def generate_image(character_name: str, appearance_description: str) -> str:
     Returns:
         JSON string with keys: character_name, image_path, status.
     """
-    safe_name = re.sub(r"[^\w\-]", "_", character_name.lower())
-    prompt = (
-        f"Character reference illustration for '{character_name}'. "
-        f"{appearance_description}. "
-        "Cinematic lighting, high detail, character portrait, film production style."
-    )
-
-    # ── Try Imagen 3 first (requires paid tier) ───────────────────────────
-    imagen_err = None
+    import urllib.parse
+    import urllib.request
+    import json
+    import re
+    
     try:
-        response = client.models.generate_images(
-            model="imagen-3.0-generate-002",
-            prompt=prompt,
-            config=types.GenerateImagesConfig(number_of_images=1),
+        # Build prompt for pollination
+        prompt = (
+            f"Character reference illustration for '{character_name}'. "
+            f"{appearance_description}. "
+            "Cinematic lighting, high detail, character portrait, film production style."
         )
-        image_bytes = response.generated_images[0].image.image_bytes
+        
+        # URL encode the prompt
+        encoded_prompt = urllib.parse.quote(prompt)
+        url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=512&height=512&nologo=true"
+        
+        safe_name = re.sub(r"[^\w\-]", "_", character_name.lower())
         image_path = IMAGE_ASSETS_DIR / f"{safe_name}.png"
-        image_path.write_bytes(image_bytes)
+        
+        # Download and write the image bytes
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            image_path.write_bytes(response.read())
+
         return json.dumps({
             "character_name": character_name,
             "image_path": str(image_path),
             "status": "success",
         })
+
     except Exception as e:
-        imagen_err = e
-
-    # ── Fallback: gemini-2.0-flash image generation ───────────────────────
-    try:
-        flash_response = client.models.generate_content(
-            model=IMAGE_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["IMAGE", "TEXT"],
-            ),
+        # Graceful fallback
+        safe_name = re.sub(r"[^\w\-]", "_", character_name.lower())
+        placeholder_path = IMAGE_ASSETS_DIR / f"{safe_name}_placeholder.txt"
+        placeholder_path.write_text(
+            f"Image generation failed for {character_name}: {e}\n"
+            f"Description: {appearance_description}"
         )
-        image_data = None
-        for part in flash_response.candidates[0].content.parts:
-            if part.inline_data is not None:
-                image_data = base64.b64decode(part.inline_data.data)
-                break
-
-        if image_data:
-            image_path = IMAGE_ASSETS_DIR / f"{safe_name}.png"
-            image_path.write_bytes(image_data)
-            return json.dumps({
-                "character_name": character_name,
-                "image_path": str(image_path),
-                "status": "success_flash_fallback",
-            })
-    except Exception:
-        pass
-
-    # ── Final fallback: placeholder file ─────────────────────────────────
-    placeholder_path = IMAGE_ASSETS_DIR / f"{safe_name}_placeholder.txt"
-    placeholder_path.write_text(
-        f"Image generation placeholder for {character_name}\n"
-        f"Description: {appearance_description}\n"
-        f"Imagen error: {imagen_err}"
-    )
-    return json.dumps({
-        "character_name": character_name,
-        "image_path": str(placeholder_path),
-        "status": "placeholder_created",
-    })
+        return json.dumps({
+            "character_name": character_name,
+            "image_path": str(placeholder_path),
+            "status": f"error: {e}",
+        })
 
 
 # ─────────────────────────────────────────────
