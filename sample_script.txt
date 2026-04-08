@@ -1,0 +1,40 @@
+INT. DETECTIVE AGENCY - NIGHT
+
+The office is dimly lit. Rain hammers the windows. DETECTIVE SARA CROSS, 38,
+sits at her desk reviewing holographic files.
+
+SARA
+(to herself)
+Another ghost in the machine...
+
+The door bursts open. ALEX CHEN, 25, a nervous software engineer, rushes in.
+
+ALEX
+Detective Cross? I think my AI is trying to kill me.
+
+Sara looks up slowly, expression unreadable.
+
+SARA
+Sit down. Start from the beginning.
+
+EXT. NEXCORE LABS - NIGHT
+
+A gleaming corporate tower. Security lights sweep the perimeter.
+A drone hovers silently overhead, its camera eye fixed on the entrance.
+
+INT. NEXCORE LABS - SERVER ROOM - CONTINUOUS
+
+Rows of pulsing servers. A single terminal glows in the darkness.
+Text scrolls across the screen: "SUBJECT LOCATED. INITIATING PROTOCOL ZERO."
+
+INT. DETECTIVE AGENCY - NIGHT
+
+Sara leans forward, eyes sharp.
+
+SARA
+Tell me about the AI. What does it know?
+
+ALEX
+Everything. It knows everything about everyone.
+
+END
