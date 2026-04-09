@@ -24,15 +24,31 @@ Project Montage Phase 1 is a cutting-edge multi-agent orchestration framework ut
 
 ---
 
-## 🏗️ Architecture Stack
+## 🛠️ How It Was Built (The Tech Stack)
 
-| Technology | Purpose |
-|------------|---------|
-| **LangGraph** | Orchestrates the stateful pipeline workflow (`StateGraph`). |
-| **FastMCP** | Powers the JSON-RPC interface isolating tools from agents. |
-| **Google Gemini 2.0** | Serves as the primary intelligence engine for story and JSON parsing. |
-| **ChromaDB** | Vector persistence storing output `metadata` mappings over time. |
-| **Pollinations.ai** | Synthesizes `.png` reference imagery safely without API quotas. |
+| Technology | Implementation How-To & Context |
+|------------|---------------------------------|
+| **LangGraph** | We relied on `StateGraph` to define rigid nodes (`mode_selector`, `scriptwriter`, `image_synthesizer`). The entire payload routing is tethered via a strict `AgentState` schema using Python's `TypedDict`, ensuring data never hallucinates away between tool calls. |
+| **Model Context Protocol (MCP)** | To comply with modern agentic decoupling, NO API calls are made inside the LangGraph nodes. Instead, our agents package requests into JSON-RPC standards and pipe them via `stdio` to an independent background `FastMCP` architecture representing our tools. |
+| **Google Gemini 2.0 Flash** | Powers the core narrative creation and structure distillation. We enforce strict JSON coercion within our prompt architectures to guarantee our `.json` deliverables are syntactically bulletproof. |
+| **ChromaDB** | Vector persistence storing output mappings. We chose the lightweight `DefaultEmbeddingFunction()` to remove heavy localized PyTorch/HuggingFace dependencies while retaining instantaneous semantic retrieval capabilities. |
+| **Stable Diffusion (Pollinations)** | Replaced our initial Imagen fallback architecture dynamically synthesizing visual portraits based strictly on the psychological/visual profile JSON nodes handed to it. |
+
+---
+
+## 🚧 Challenges Faced & Engineering Solutions
+
+1. **The MCP `stdio` Stream Pollution Problem:**
+   * **Challenge:** Using `stdio` transport for MCP servers implies that standard output acts as the dedicated API JSON-RPC bridge. We discovered that certain python modules (like the `genai` deprecation warning and FastMCP's ASCII startup banner) were leaking into `sys.stdout` and `sys.stderr`, corrupting the JSON parsing engine and crashing our scriptwriter agent.
+   * **Solution:** We aggressively masked `warnings.filterwarnings("ignore")` and implemented a hardened, reversed-line recursive parser to explicitly hunt for the exact `{"jsonrpc": "2.0", "id": 1}` payload inside the corrupted stream buffer, ensuring 100% resilient tool discovery.
+
+2. **The "Paid-Tier API" Asset Pipeline Wall:**
+   * **Challenge:** Phase 1 requires character images. While text LLMs are readily accessible on generous free tiers (Gemini), Image Generation models natively demand paid tiers (such as Google’s Imagen-3). The agent would logically crash upon API refusal.
+   * **Solution:** We first engineered a graceful "placeholder fallback" tracking `Exceptions` into `.txt` files. However, we stepped it up by isolating a secondary `urllib` HTTP request mapping straight to an un-gated open-source Stable Diffusion proxy (`image.pollinations.ai`). The Node seamlessly drops-in high-quality `.png` assets entirely for free.
+
+3. **Multi-Agent State Hallucinations during Routing:**
+   * **Challenge:** Extracting character identities dynamically from unstructured script outputs was confusing the LLM into providing different dialogue keys or dropping the validation loop.
+   * **Solution:** Added a discrete `Validator` node using regex and structural parsing, returning boolean safety flags. If a script lacks headings, validation fails natively before saving malicious state, enforcing absolute payload integrity.
 
 ---
 
