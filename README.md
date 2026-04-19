@@ -1,14 +1,14 @@
 <div align="center">
   
-# 🎬 PROJECT MONTAGE: The Writer's Room
-### Phase 1: Autonomous Story & Image Generation Layer
+# 🎬 PROJECT MONTAGE
+### Phase 1: The Writer's Room | Phase 2: The Studio Floor
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![LangGraph](https://img.shields.io/badge/LangGraph-Stateful_Agents-orange?style=for-the-badge)](https://python.langchain.com/docs/langgraph)
 [![MCP](https://img.shields.io/badge/MCP-Protocol-purple?style=for-the-badge)](https://github.com/microsoft/multi-agent-frameworks)
-[![Gemini](https://img.shields.io/badge/Google-Gemini_2.0_Flash-success?style=for-the-badge&logo=google)](https://deepmind.google/technologies/gemini/)
+[![Gemini](https://img.shields.io/badge/Google-Gemini_2.5_Flash-success?style=for-the-badge&logo=google)](https://deepmind.google/technologies/gemini/)
 
-Project Montage Phase 1 is a cutting-edge multi-agent orchestration framework utilizing **LangGraph** and the **Model Context Protocol (MCP)**. This system simulates a Hollywood "Writer's Room", capable of autonomously reading or writing film treatments, validating structures, storing memory using ChromaDB, and synthesizing concept artwork for extracted character identities.
+A cutting-edge **multi-agent orchestration framework** using **LangGraph** and the **Model Context Protocol (MCP)**. Phase 1 simulates a Hollywood "Writer's Room" — autonomously generating screenplays and character art. Phase 2 implements "The Studio Floor" — a **parallel multi-agent system** that transforms structured narrative into **synchronized audiovisual content**.
 
 </div>
 
@@ -16,58 +16,95 @@ Project Montage Phase 1 is a cutting-edge multi-agent orchestration framework ut
 
 ## 🌟 Key Features
 
+### Phase 1: The Writer's Room
 * 🧠 **Multi-Agent Orchestration**: Stateful graph delegation between 5 isolated agents (Selector, Validator, Scriptwriter, Designer, Synthesizer).
-* 🔌 **Dynamic MCP Discovery**: All LLM cognitive abilities are stripped from the agents and delegated into an isolated FastMCP server using `stdio` transport.
-* ⏸️ **Human-in-the-Loop (HITL)**: Built-in strict checkpoints pausing the graph before character generation to allow director approvals.
-* 🎨 **Autonomous Asset Synthesis**: Automatically maps generated identities into a seamless, free-tier-friendly Stable-Diffusion proxy (Pollinations.ai) to generate beautiful `.png` character sheets.
-* 🗄️ **Memory Persistence**: Embedded local **ChromaDB** tracks all synthesized characters and narrative sequences perfectly across iterations.
+* 🔌 **Dynamic MCP Discovery**: All LLM cognitive abilities are delegated into an isolated FastMCP server using `stdio` transport.
+* ⏸️ **Human-in-the-Loop (HITL)**: Built-in checkpoints pausing the graph before character generation for director approvals.
+* 🎨 **Autonomous Asset Synthesis**: Generates character reference images via Pollinations.ai (free Stable Diffusion proxy).
+* 🗄️ **Memory Persistence**: Embedded local **ChromaDB** tracks all synthesized characters and narrative sequences.
+
+### Phase 2: The Studio Floor
+* 🎤 **Voice Synthesis**: Emotion-aware TTS using Microsoft Neural voices (edge-tts) with per-character voice identity.
+* 🎬 **Video Generation**: Scene visuals generated via Pollinations.ai, assembled into animated videos with Ken Burns effects.
+* 🎭 **Face Mapping**: Character reference images composited onto video frames with identity validation.
+* 👄 **Lip Sync**: Audio-video temporal alignment with frame-by-frame synchronization.
+* ⚡ **Parallel Processing**: Audio and video branches execute **concurrently** via LangGraph's `Send()` API.
+* 🛡️ **Fault Tolerance**: Stateful resumability with `commit_memory` checkpoints at every stage.
 
 ---
 
-## 🛠️ How It Was Built (The Tech Stack)
+## 🛠️ Tech Stack
 
-| Technology | Implementation How-To & Context |
-|------------|---------------------------------|
-| **LangGraph** | We relied on `StateGraph` to define rigid nodes (`mode_selector`, `scriptwriter`, `image_synthesizer`). The entire payload routing is tethered via a strict `AgentState` schema using Python's `TypedDict`, ensuring data never hallucinates away between tool calls. |
-| **Model Context Protocol (MCP)** | To comply with modern agentic decoupling, NO API calls are made inside the LangGraph nodes. Instead, our agents package requests into JSON-RPC standards and pipe them via `stdio` to an independent background `FastMCP` architecture representing our tools. |
-| **Google Gemini 2.0 Flash** | Powers the core narrative creation and structure distillation. We enforce strict JSON coercion within our prompt architectures to guarantee our `.json` deliverables are syntactically bulletproof. |
-| **ChromaDB** | Vector persistence storing output mappings. We chose the lightweight `DefaultEmbeddingFunction()` to remove heavy localized PyTorch/HuggingFace dependencies while retaining instantaneous semantic retrieval capabilities. |
-| **Stable Diffusion (Pollinations)** | Replaced our initial Imagen fallback architecture dynamically synthesizing visual portraits based strictly on the psychological/visual profile JSON nodes handed to it. |
+| Technology | Role |
+|------------|------|
+| **LangGraph** | `StateGraph` with `Send()` API for parallel branching |
+| **Model Context Protocol (MCP)** | 11 tools exposed via FastMCP (5 Phase 1 + 6 Phase 2) |
+| **Google Gemini 2.5 Flash** | Script generation, character profiling |
+| **ChromaDB** | Vector persistence for memory and fault tolerance |
+| **Pollinations.ai** | Free image & scene generation (no API key required) |
+| **edge-tts** | Microsoft Neural TTS with emotion-aware speech synthesis |
+| **moviepy** | Video composition, Ken Burns effects, A/V merging |
+| **Pillow** | Face compositing and identity validation |
 
 ---
 
-## 🚧 Challenges Faced & Engineering Solutions
+## 🏗️ Architecture
 
-1. **The MCP `stdio` Stream Pollution Problem:**
-   * **Challenge:** Using `stdio` transport for MCP servers implies that standard output acts as the dedicated API JSON-RPC bridge. We discovered that certain python modules (like the `genai` deprecation warning and FastMCP's ASCII startup banner) were leaking into `sys.stdout` and `sys.stderr`, corrupting the JSON parsing engine and crashing our scriptwriter agent.
-   * **Solution:** We aggressively masked `warnings.filterwarnings("ignore")` and implemented a hardened, reversed-line recursive parser to explicitly hunt for the exact `{"jsonrpc": "2.0", "id": 1}` payload inside the corrupted stream buffer, ensuring 100% resilient tool discovery.
+### Phase 2 Parallel Processing Pipeline
 
-2. **The "Paid-Tier API" Asset Pipeline Wall:**
-   * **Challenge:** Phase 1 requires character images. While text LLMs are readily accessible on generous free tiers (Gemini), Image Generation models natively demand paid tiers (such as Google’s Imagen-3). The agent would logically crash upon API refusal.
-   * **Solution:** We first engineered a graceful "placeholder fallback" tracking `Exceptions` into `.txt` files. However, we stepped it up by isolating a secondary `urllib` HTTP request mapping straight to an un-gated open-source Stable Diffusion proxy (`image.pollinations.ai`). The Node seamlessly drops-in high-quality `.png` assets entirely for free.
-
-3. **Multi-Agent State Hallucinations during Routing:**
-   * **Challenge:** Extracting character identities dynamically from unstructured script outputs was confusing the LLM into providing different dialogue keys or dropping the validation loop.
-   * **Solution:** Added a discrete `Validator` node using regex and structural parsing, returning boolean safety flags. If a script lacks headings, validation fails natively before saving malicious state, enforcing absolute payload integrity.
+```
+scene_manifest.json
+        │
+  ┌─────▼─────┐
+  │Scene Parser│  ← get_task_graph, commit_memory
+  └─────┬─────┘
+        │
+   Send() API          ← PARALLEL BRANCHING
+   ┌────┴────┐
+   │         │
+┌──▼──┐  ┌──▼───┐
+│Voice│  │Video │     ← voice_cloning_synthesizer
+│Synth│  │ Gen  │     ← query_stock_footage
+└──┬──┘  └──┬───┘
+   │         │
+   └────┬────┘         ← CONVERGENCE
+        │
+  ┌─────▼─────┐
+  │ Face Swap │       ← identity_validator + face_swapper
+  └─────┬─────┘
+        │
+  ┌─────▼─────┐
+  │ Lip Sync  │       ← lip_sync_aligner
+  └─────┬─────┘
+        │
+  ┌─────▼─────┐
+  │  Output   │       ← raw_scenes/*.mp4
+  └───────────┘
+```
 
 ---
 
 ## 📂 Project Structure
 
 ```text
-├── agents/             # Node definitions for LangGraph (HITL, Extractors, Writers)
+├── agents/             # Node definitions for LangGraph
 ├── graph/
-│   └── workflow.py     # Core StateGraph conditional logic pipeline
+│   └── workflow.py     # Core StateGraph: Phase 1 + Phase 2 workflows
 ├── mcp_server/
-│   └── server.py       # FastMCP stdio server (Houses all Gemini Tools)
+│   └── server.py       # FastMCP server (11 tools: Phase 1 + Phase 2)
 ├── state/
-│   └── schema.py       # TypedDict AgentState Definitions
-├── outputs/            # (Generated Assets)
-│   ├── image_assets/       # .png artwork goes here
+│   └── schema.py       # TypedDict AgentState with Annotated parallel fields
+├── outputs/
+│   ├── image_assets/       # .png character artwork
+│   ├── raw_scenes/         # .mp4 final scene videos (Phase 2)
+│   ├── audio/              # .wav voice tracks (Phase 2)
+│   ├── frames/             # Intermediate frame sequences (Phase 2)
 │   ├── scene_manifest.json # Compiled film skeleton
-│   └── character_db.json   # JSON identity mappings
-├── config.py           # Core variables and routing
-├── main.py             # CLI Launch Interface 
+│   ├── character_db.json   # JSON identity mappings
+│   └── task_graph_log.json # Task decomposition log (Phase 2)
+├── config.py           # Core variables, paths, voice mappings
+├── main.py             # CLI Launch Interface
+├── requirements.txt    # Python dependencies
 └── README.md           # You are here!
 ```
 
@@ -76,36 +113,100 @@ Project Montage Phase 1 is a cutting-edge multi-agent orchestration framework ut
 ## 🚀 Getting Started
 
 ### 1. Requirements & Setup
-Make sure you have python installed. It is highly recommended to use a virtual environment.
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 2. Environment Variables
-Create a `.env` file in the root directory and supply your Gemini API key:
+Create a `.env` file in the root directory:
 ```env
 GOOGLE_API_KEY="AIzaSyYourSecretKeyHere..."
 ```
 
 ### 3. Execution
-Launch the orchestration interface:
+
+#### Phase 1 Only (Script + Character Generation)
+```bash
+python main.py --demo
+```
+
+#### Phase 2 Only (Video + Audio Synthesis)
+```bash
+python main.py --phase2
+```
+
+#### Full End-to-End Pipeline
+```bash
+python main.py --full --demo
+```
+
+#### Resume from Crash
+```bash
+python main.py --phase2 --resume
+```
+
+#### Interactive Mode
 ```bash
 python main.py
 ```
+Presents options:
+1. **Autonomous** – AI generates screenplay from your prompt
+2. **Manual** – Paste your own screenplay
+3. **Demo** – Built-in psychological thriller demo
+4. **Phase 2** – Run Studio Floor on existing manifest
+5. **Full Demo** – Phase 1 → Phase 2 end-to-end
 
-It will present three modes:
-- `1 - Autonomous`: Pass a single creative prompt, and the AI will construct the screenplay.
-- `2 - Manual`: Paste your own raw screenplay text, forcing the AI to strictly parse and extract from it.
-- `3 - Demo`: Automatically runs a high-stakes psychological thriller simulation to prove functionality.
+---
+
+## 🤖 MCP Tools Reference
+
+### Phase 1 Tools
+| Tool | Description |
+|------|-------------|
+| `generate_script_segment` | Generates structured multi-scene screenplay |
+| `validate_script` | Validates manually provided screenplays |
+| `commit_memory` | Stores data in ChromaDB vector store |
+| `query_memory` | Retrieves semantically similar documents |
+| `generate_image` | Generates character reference images |
+
+### Phase 2 Tools
+| Tool | Description |
+|------|-------------|
+| `get_task_graph` | Decomposes scenes into parallelizable task graph |
+| `voice_cloning_synthesizer` | Emotion-aware TTS with per-character voices |
+| `query_stock_footage` | Generates scene visuals → animated video |
+| `identity_validator` | Validates character identity before face mapping |
+| `face_swapper` | Composites character faces onto video frames |
+| `lip_sync_aligner` | Synchronizes audio waveform with video frames |
 
 ---
 
 ## 📜 Output Deliverables
 
-Upon a successful workflow path matching an approved **HITL Checkpoint**, the application generates the following assets:
-1. `scene_manifest.json`: Extracted structured scene representations.
-2. `character_db.json`: Isolated identities, descriptions, and psychological trait mappings.
-3. `image_assets/*.png`: Rendered visual models for every single character discovered inside the manifest.
+### Phase 1
+* `scene_manifest.json` — Structured scene representations
+* `character_db.json` — Character identity mappings
+* `image_assets/*.png` — Character reference images
+
+### Phase 2
+* `raw_scenes/scene_XX.mp4` — Final lip-synced scene videos
+* `audio/scene_XX_*.wav` — Voice synthesis audio tracks
+* `task_graph_log.json` — Task decomposition log
+* `phase2_checkpoint.json` — Resumability checkpoint
+
+---
+
+## 📊 Evaluation Coverage
+
+| Criteria | Marks | Implementation |
+|----------|-------|---------------|
+| Parallel Architecture | 10 | `Send()` API fan-out for audio + video branches |
+| Audio Quality | 20 | edge-tts Neural voices with emotion modulation |
+| Video Quality | 20 | Pollinations.ai images + moviepy Ken Burns animation |
+| Lip Sync Accuracy | 10 | Audio-video temporal alignment via moviepy |
+| MCP Tool Usage | 5 | 11 tools via FastMCP with dynamic discovery |
+| Fault Tolerance | 5 | `commit_memory` checkpoints + `--resume` flag |
+| **Total** | **70** | |
 
 ---
 
