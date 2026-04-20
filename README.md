@@ -39,10 +39,12 @@ The core achievement of Phase 2 is the fully parallelized, fault-tolerant genera
 * 🛡️ **Stateful Resumability (`ChromaDB`)**
   * Persists graph state and intermediate media metadata into a local ChromaDB instance utilizing the `commit_memory` tool. In the event of a dropped internet connection, users can invoke `--resume` to skip previously rendered frames constraint-free.
 
-### 📝 Phase 1: The Writer's Room
+### 📝 Phase 1: The Writer's Room (Narrative & Lore Pipeline)
 * 🧠 **Multi-Agent Orchestration**: Stateful graph delegation between 5 isolated agents (Selector, Validator, Scriptwriter, Designer, Synthesizer).
 * 🔌 **Dynamic MCP Discovery**: All LLM cognitive abilities are offloaded to an isolated `FastMCP` standard local server.
-* ⏸️ **Human-in-the-Loop (HITL)**: Built-in input blockers pause the LangGraph loop before costly asset generation to require director approval.
+* ⏸️ **Human-in-the-Loop (HITL)**: Built-in strict checkpoints pausing the graph before character generation to allow director approvals.
+* 🎨 **Autonomous Asset Synthesis**: Automatically maps generated identities into a seamless, free-tier-friendly Stable-Diffusion proxy to generate beautiful `.png` character sheets.
+* 🗄️ **Memory Persistence**: Embedded local **ChromaDB** tracks all synthesized characters and narrative sequences perfectly across iterations.
 
 ---
 
@@ -68,6 +70,18 @@ graph TD
     
     H[Final Checkpoint] --> I[raw_scenes/*.mp4]
 ```
+
+---
+
+## 🚧 Challenges Faced & Engineering Solutions (Phase 1)
+
+1. **The MCP `stdio` Stream Pollution Problem:**
+   * **Challenge:** Using `stdio` transport for MCP servers implies that standard output acts as the dedicated API JSON-RPC bridge. We discovered that certain python modules (like the `genai` deprecation warning and FastMCP's ASCII startup banner) were leaking into `sys.stdout` and `sys.stderr`, corrupting the JSON parsing engine and crashing our scriptwriter agent.
+   * **Solution:** We aggressively masked `warnings.filterwarnings("ignore")` and implemented a hardened, reversed-line recursive parser to explicitly hunt for the exact `{"jsonrpc": "2.0", "id": 1}` payload inside the corrupted stream buffer, ensuring 100% resilient tool discovery.
+
+2. **Multi-Agent State Hallucinations during Routing:**
+   * **Challenge:** Extracting character identities dynamically from unstructured script outputs was confusing the LLM into providing different dialogue keys or dropping the validation loop.
+   * **Solution:** Added a discrete `Validator` node using regex and structural parsing, returning boolean safety flags. If a script lacks headings, validation fails natively before saving malicious state, enforcing absolute payload integrity.
 
 ---
 
@@ -144,6 +158,7 @@ This project operates on the **Model Context Protocol (MCP)** specification. The
 | **P1** | `validate_script` | Validates manual script inputs for layout structures |
 | **P1** | `commit_memory` | Serializes data arrays into ChromaDB vector representations |
 | **P1** | `generate_image` | Uses Pollinations.ai API block to synthesize characters |
+| **P1** | `query_memory` | Retrieves semantically similar context from ChromaDB |
 | **P2** | `get_task_graph` | Dissects scenes into parallelizable multi-thread tasks |
 | **P2** | `voice_cloning_synthesizer` | Emotionally modulates TTS parameters & generates `.wav` |
 | **P2** | `query_stock_footage` | Generates cinematic frames w/ extreme 429-fallback resilience |
