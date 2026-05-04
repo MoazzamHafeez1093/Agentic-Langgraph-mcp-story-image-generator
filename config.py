@@ -17,14 +17,11 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 #  LLM Settings
 # ─────────────────────────────────────────────
 LLM_MODEL = "gemini-2.5-flash"
-IMAGE_MODEL = "gemini-2.5-flash"
+# IMAGE_MODEL: image generation uses Pollinations.ai (free, no API key needed)
 
-# ─────────────────────────────────────────────
-#  MCP Server Settings
-# ─────────────────────────────────────────────
-MCP_SERVER_HOST = "localhost"
-MCP_SERVER_PORT = 8765
-MCP_SERVER_URL = f"http://{MCP_SERVER_HOST}:{MCP_SERVER_PORT}"
+# MCP Integration: tools are defined in mcp_server/server.py with @mcp.tool()
+# and called directly as Python functions via _call_mcp_tool() in workflow.py.
+# No HTTP transport is used — stdio transport is only for standalone mcp_server/server.py.
 
 # ─────────────────────────────────────────────
 #  Output Paths – Phase 1

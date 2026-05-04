@@ -1,25 +1,19 @@
 """
 PROJECT MONTAGE – Phase 1: The Writer's Room
-LangGraph Workflow – agents/*.py
+agents/__init__.py
 
-Each agent function is a LangGraph node:
-  - Receives AgentState
-  - Calls MCP tools (via mcp_client)
-  - Returns partial state dict
+NOTE: All agent logic lives in graph/workflow.py as LangGraph nodes.
+      This package is kept for project structure clarity.
+      The project uses google.genai SDK directly (not langchain_google_genai).
 """
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import HumanMessage, SystemMessage
 from config import GOOGLE_API_KEY, LLM_MODEL
+from google import genai
 
-def _get_llm():
-    return ChatGoogleGenerativeAI(
-        model=LLM_MODEL,
-        google_api_key=GOOGLE_API_KEY,
-        temperature=0.7,
-    )
+def _get_gemini_client():
+    """Return a configured Gemini client (google.genai SDK)."""
+    return genai.Client(api_key=GOOGLE_API_KEY)

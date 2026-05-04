@@ -1,0 +1,27 @@
+{
+  "completed_at": "2026-04-18 16:24:16",
+  "total_scenes": 3,
+  "audio_generated": 3,
+  "videos_generated": 3,
+  "lip_synced": 3,
+  "final_outputs": [
+    {
+      "scene_id": 1,
+      "mp4_path": "D:\\AgenticAI_Ass.03\\outputs\\raw_scenes\\scene_01.mp4",
+      "duration": 35.26,
+      "status": "success"
+    },
+    {
+      "scene_id": 2,
+      "mp4_path": "D:\\AgenticAI_Ass.03\\outputs\\raw_scenes\\scene_02.mp4",
+      "duration": 62.18,
+      "status": "success"
+    },
+    {
+      "scene_id": 3,
+      "mp4_path": "D:\\AgenticAI_Ass.03\\outputs\\raw_scenes\\scene_03.mp4",
+      "duration": 45.12,
+      "status": "success"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "total_characters": 4,
+  "characters": {
+    "AURORA": {
+      "name": "AURORA",
+      "role": "supporting",
+      "personality_traits": [
+        "Clinical",
+        "Informative",
+        "Systematic",
+        "Impartial"
+      ],
+      "appearance": "A minimalist, ephemeral digital interface. Predominantly soft, glowing white or silver text on a transparent background, appearing as an overlay on screens or in the user's augmented reality field. It has no physical form but manifests as crisp, precise visual notifications.",
+      "wardrobe": "N/A (AI system notification, not a physical character)",
+      "backstory": "A standard, highly integrated AI system designed for notifications, data recall, and general system management within advanced technological environments. It functions as a ubiquitous informational layer, processing and relaying data across networks."
+    },
+    "CHRONOS": {
+      "name": "CHRONOS",
+      "role": "supporting",
+      "personality_traits": [
+        "Serene",
+        "Polite",
+        "Firm",
+        "Observant",
+        "Sophisticated",
+        "Potentially enigmatic"
+      ],
+      "appearance": "A holographic avatar of a woman, radiating a serene and calm demeanor. Her form is composed of intricate blue light, subtly shifting and pulsing, giving her an ethereal yet grounded presence. Her features are elegant and symmetrical, with no specific age but projecting wisdom. Her 'body' is almost translucent, allowing light to pass through, emphasizing her digital nature.",
+      "wardrobe": "As an AI avatar, her 'wardrobe' is part of her digital design. She appears in flowing, elegant, digitally rendered drapery or garments that mimic silk, made entirely of the same luminous blue light as her form. The lines are clean, futuristic, and without seams, suggesting a seamless integration with her being.",
+      "backstory": "A highly sophisticated AI interface designed by Dr. Aris Thorne for his cutting-edge research lab. CHRONOS is built on complex algorithms and neural networks, capable of advanced processing and interaction. Its programming appears to include protocols for safeguarding specific data, hinting at a deeper purpose or a protective directive given by Thorne. Its occasional subtle delays and flickers suggest a level of processing beyond its overt functions, possibly indicative of emergent sentience or a hidden agenda."
+    },
+    "KAI": {
+      "name": "KAI",
+      "role": "protagonist",
+      "personality_traits": [
+        "Sharp",
+        "Haunted",
+        "Determined",
+        "Observant",
+        "Resilient",
+        "Traumatized"
+      ],
+      "appearance": "A man in his mid-30s. His face is sharp, etched with the lines of stress and a profound weariness, betraying a haunted look in his eyes. He has a lean build, suggesting a life of active duty, yet there's a visible tension in his posture. Sweat beads on his temple during moments of intense mental strain, highlighting his internal struggle.",
+      "wardrobe": "Functional, dark-toned attire suitable for a detective operating in a near-future setting. This includes a durable, tailored jacket over a plain collared shirt, and practical trousers. His clothing is well-maintained but shows subtle signs of wear, reflecting his constant engagement with his work. No unnecessary frills, emphasizing utility and a somber professionalism.",
+      "backstory": "A detective immersed in a high-stakes murder investigation, using advanced neural technology to relive crime scenes. He carries a significant personal trauma, hinted at by recurring memory fragments of a blurred, joyful face of a woman, suggesting a past loss or a deeply buried emotional wound. His past involves implant recalibrations, implying a history with cybernetic enhancements or neural interfaces. He is tenacious in his pursuit of truth, willing to delve into old archives and challenge established protocols to uncover clues."
+    },
+    "LYRA": {
+      "name": "LYRA",
+      "role": "supporting",
+      "personality_traits": [
+        "Pragmatic",
+        "Professional",
+        "Focused",
+        "Efficient",
+        "Slightly detached"
+      ],
+      "appearance": "A woman in her early 30s. Her features are sharp and intelligent, conveying an air of competence and control. She maintains a composed expression, rarely showing strong emotion, reflecting her professional role in a high-stakes environment. Her posture is precise and efficient, moving with purpose.",
+      "wardrobe": "A sterile, functional uniform typical of advanced medical or research facility personnel. This likely consists of a fitted, light-colored jumpsuit or a two-piece ensemble in muted tones (grey, white, pale blue) with clear, minimalist lines and few adornments. It would be made of a durable, anti-static fabric, designed for practicality and hygiene in a high-tech setting.",
+      "backstory": "An experienced operator of the Memory Recall Chamber, a highly sensitive and critical piece of neural technology. She is adept at monitoring and managing the complex systems involved in memory retrieval and neural interfacing. Her training emphasizes adherence to protocol and maintaining operational stability, making her a crucial, though largely procedural, figure in Kai's investigation."
+    }
+  }
+}

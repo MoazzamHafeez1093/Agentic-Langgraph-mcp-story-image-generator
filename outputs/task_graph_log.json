@@ -1,0 +1,109 @@
+{
+  "total_scenes": 3,
+  "total_tasks": 6,
+  "parallel_branches": [
+    "audio",
+    "video"
+  ],
+  "execution_order": [
+    "scene_parser",
+    "parallel(voice_synth, video_gen)",
+    "face_swap",
+    "lip_sync",
+    "output"
+  ],
+  "tasks": [
+    {
+      "scene_id": 1,
+      "heading": "INT. MEMORY RECALL CHAMBER - DAY",
+      "status": "pending",
+      "branches": {
+        "audio": {
+          "task_type": "voice_synthesis",
+          "status": "pending",
+          "dialogue_count": 4,
+          "characters": [
+            "KAI",
+            "LYRA"
+          ]
+        },
+        "video": {
+          "task_type": "video_generation",
+          "status": "pending",
+          "visual_cue_count": 3,
+          "action": "KAI, mid-30s, sharp but with a haunted look in his eyes, sits strapped into a high-tech chair. Electrodes spiderweb across his temples. The room is dimly lit, sterile. A digital countdown ticks on a m"
+        }
+      },
+      "post_processing": {
+        "face_swap": {
+          "status": "pending"
+        },
+        "lip_sync": {
+          "status": "pending"
+        }
+      }
+    },
+    {
+      "scene_id": 2,
+      "heading": "INT. THORNE'S LAB - NIGHT",
+      "status": "pending",
+      "branches": {
+        "audio": {
+          "task_type": "voice_synthesis",
+          "status": "pending",
+          "dialogue_count": 6,
+          "characters": [
+            "KAI",
+            "CHRONOS (AI)"
+          ]
+        },
+        "video": {
+          "task_type": "video_generation",
+          "status": "pending",
+          "visual_cue_count": 3,
+          "action": "KAI stands in Thorne's deserted AI research lab. Holographic displays hum with complex algorithms and neural networks, casting an eerie blue glow. Dust motes dance in the faint light filtering from th"
+        }
+      },
+      "post_processing": {
+        "face_swap": {
+          "status": "pending"
+        },
+        "lip_sync": {
+          "status": "pending"
+        }
+      }
+    },
+    {
+      "scene_id": 3,
+      "heading": "INT. KAI'S APARTMENT - DAWN",
+      "status": "pending",
+      "branches": {
+        "audio": {
+          "task_type": "voice_synthesis",
+          "status": "pending",
+          "dialogue_count": 6,
+          "characters": [
+            "KAI",
+            "AURORA (AI notification)",
+            "CHRONOS (AI voice - implied)"
+          ]
+        },
+        "video": {
+          "task_type": "video_generation",
+          "status": "pending",
+          "visual_cue_count": 3,
+          "action": "KAI is alone, pacing his minimalist apartment. The city lights glow faintly outside, painting the room in cool blues and purples. He's reviewing Thorne's encrypted journal on his data slate. One entry"
+        }
+      },
+      "post_processing": {
+        "face_swap": {
+          "status": "pending"
+        },
+        "lip_sync": {
+          "status": "pending"
+        }
+      }
+    }
+  ],
+  "timestamp": "2026-04-18 16:14:01"
+}

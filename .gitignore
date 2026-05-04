@@ -2,7 +2,13 @@ __pycache__/
 *.pyc
 .env
 chroma_db/
-outputs/
 debug_output.txt
 .venv/
 env/
+
+# Ignore bulk generated media (large files) but keep proof-of-run JSON artifacts
+outputs/frames/
+outputs/image_assets/
+# Keep: outputs/scene_manifest.json, outputs/character_db.json,
+#        outputs/phase2_checkpoint.json, outputs/task_graph_log.json
+#        outputs/audio/*.wav, outputs/raw_scenes/*.mp4
